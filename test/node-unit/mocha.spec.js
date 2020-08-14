@@ -52,12 +52,15 @@ describe('Mocha', function() {
     // we don't need the constants themselves, but the object cannot be undefined
     stubs.Runner.constants = {};
 
-    Mocha = rewiremock.proxy(MODULE_PATH, r => ({
-      '../../lib/utils.js': r.with(stubs.utils).callThrough(),
-      '../../lib/suite.js': stubs.Suite,
-      '../../lib/nodejs/parallel-buffered-runner.js': stubs.BufferedRunner,
-      '../../lib/runner.js': stubs.Runner
-    }));
+    Mocha = rewiremock.proxy(
+      () => require(MODULE_PATH),
+      r => ({
+        '../../lib/utils.js': r.with(stubs.utils).callThrough(),
+        '../../lib/suite.js': stubs.Suite,
+        '../../lib/nodejs/parallel-buffered-runner.js': stubs.BufferedRunner,
+        '../../lib/runner.js': stubs.Runner
+      })
+    );
     delete require.cache[DUMB_FIXTURE_PATH];
     delete require.cache[DUMBER_FIXTURE_PATH];
   });

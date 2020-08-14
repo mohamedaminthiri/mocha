@@ -40,15 +40,18 @@ describe('buffered-runner', function() {
           stats: sinon.stub().returns({})
         })
       };
-      BufferedRunner = rewiremock.proxy(BUFFERED_RUNNER_PATH, r => ({
-        '../../lib/nodejs/buffered-worker-pool': {
-          BufferedWorkerPool
-        },
-        os: {
-          cpus: sinon.stub().callsFake(() => new Array(cpuCount))
-        },
-        '../../lib/utils': r.with({warn}).callThrough()
-      }));
+      BufferedRunner = rewiremock.proxy(
+        () => require(BUFFERED_RUNNER_PATH),
+        r => ({
+          '../../lib/nodejs/buffered-worker-pool': {
+            BufferedWorkerPool
+          },
+          os: {
+            cpus: sinon.stub().callsFake(() => new Array(cpuCount))
+          },
+          '../../lib/utils': r.with({warn}).callThrough()
+        })
+      );
     });
 
     describe('constructor', function() {

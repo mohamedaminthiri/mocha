@@ -24,7 +24,7 @@ describe('worker', function() {
   describe('when run as main process', function() {
     it('should throw', function() {
       expect(() => {
-        rewiremock.proxy(WORKER_PATH, {
+        rewiremock.proxy(() => require(WORKER_PATH), {
           workerpool: {
             isMainThread: true,
             worker: stubs.workerpool.worker
@@ -59,7 +59,7 @@ describe('worker', function() {
         loadRootHooks: sinon.stub().resolves()
       };
 
-      worker = rewiremock.proxy(WORKER_PATH, {
+      worker = rewiremock.proxy(() => require(WORKER_PATH), {
         workerpool: stubs.workerpool,
         '../../lib/mocha': stubs.Mocha,
         '../../lib/nodejs/serializer': stubs.serializer,

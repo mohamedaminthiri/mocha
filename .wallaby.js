@@ -15,6 +15,10 @@ module.exports = () => {
         pattern: 'test/unit/**/*.fixture.js',
         instrument: false
       },
+      {
+        pattern: 'test/integration/fixtures/options/watch/*.fixture.js',
+        instrument: false
+      },
       'package.json',
       'test/opts/mocha.opts',
       'mocharc.yml'
@@ -25,7 +29,11 @@ module.exports = () => {
       'test/assertions.js',
       'lib/browser/**/*.js'
     ],
-    tests: ['test/unit/**/*.spec.js', 'test/node-unit/**/*.spec.js'],
+    tests: [
+      'test/unit/**/*.spec.js',
+      'test/node-unit/**/*.spec.js',
+      'test/integration/module-map.spec.js'
+    ],
     env: {
       type: 'node',
       runner: 'node'
@@ -48,6 +56,7 @@ module.exports = () => {
       );
       require('./test/setup');
     },
-    debug: true
+    debug: true,
+    preservePaths: true
   };
 };

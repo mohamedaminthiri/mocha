@@ -338,11 +338,12 @@ function runMochaWatch(args, cwd, change) {
       return resultPromise;
     })
     .then(data => {
-      const testResults = data.output
+      const results = data.output
         // eslint-disable-next-line no-control-regex
         .replace(/\u001b\[\?25./g, '')
-        .split('\u001b[2K')
-        .map(x => JSON.parse(x));
+        .split('\u001b[2K');
+      console.error(results);
+      const testResults = results.map(x => JSON.parse(x));
       return testResults;
     });
 }

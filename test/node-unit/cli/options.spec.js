@@ -14,14 +14,17 @@ const proxyLoadOptions = ({
   findConfig = {},
   loadConfig = {}
 } = {}) =>
-  rewiremock.proxy(modulePath, r => ({
-    fs: r.with({readFileSync}).directChildOnly(),
-    [mocharcPath]: defaults,
-    'find-up': r
-      .by(() => (findupSync ? {sync: findupSync} : {}))
-      .directChildOnly(),
-    [configPath]: r.with({findConfig, loadConfig}).directChildOnly()
-  })).loadOptions;
+  rewiremock.proxy(
+    () => require(modulePath),
+    r => ({
+      fs: r.with({readFileSync}).directChildOnly(),
+      [mocharcPath]: defaults,
+      'find-up': r
+        .by(() => (findupSync ? {sync: findupSync} : {}))
+        .directChildOnly(),
+      [configPath]: r.with({findConfig, loadConfig}).directChildOnly()
+    })
+  ).loadOptions;
 
 const defaults = {
   timeout: 1000,
@@ -51,7 +54,7 @@ describe('options', function() {
   describe('loadOptions()', function() {
     describe('when no parameter provided', function() {
       beforeEach(function() {
-        this.timeout(1000);
+        this.timeout(2000);
         readFileSync = sinon.stub();
         readFileSync.onFirstCall().returns('{}');
         findConfig = sinon.stub().returns('/some/.mocharc.json');

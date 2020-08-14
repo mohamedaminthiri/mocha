@@ -6,4 +6,6 @@ global.expect = require('./assertions').mixinMochaAssertions(
     .clone()
     .use(require('unexpected-sinon'))
     .use(require('unexpected-eventemitter'))
+    .use(require('unexpected-set'))
+    .use(require('unexpected-map'))
 );
