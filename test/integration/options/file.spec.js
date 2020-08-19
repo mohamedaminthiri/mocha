@@ -3,7 +3,7 @@
 var path = require('path').posix;
 var helpers = require('../helpers');
 var runMochaJSON = helpers.runMochaJSON;
-var resolvePath = helpers.resolveFixturePath;
+var resolvePath = helpers.relativeFixturePath;
 
 describe('--file', function() {
   var args = [];

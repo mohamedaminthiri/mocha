@@ -372,7 +372,7 @@ function replaceFileContents(file, pattern, replacement) {
  * Creates parent directories of the destination path if necessary.
  */
 function copyFixture(fixtureName, dest) {
-  const fixtureSource = helpers.resolveFixturePath(fixtureName);
+  const fixtureSource = helpers.relativeFixturePath(fixtureName);
   fs.ensureDirSync(path.dirname(dest));
   fs.copySync(fixtureSource, dest);
 }

@@ -5,7 +5,7 @@ var spawn = require('cross-spawn').spawn;
 var path = require('path');
 var Base = require('../../lib/reporters/base');
 var debug = require('debug')('mocha:tests:integration:helpers');
-var DEFAULT_FIXTURE = resolveFixturePath('__default__');
+var DEFAULT_FIXTURE = relativeFixturePath('__default__');
 var MOCHA_EXECUTABLE = require.resolve('../../bin/mocha');
 var _MOCHA_EXECUTABLE = require.resolve('../../bin/_mocha');
 
@@ -45,11 +45,8 @@ module.exports = {
 
   getSummary: getSummary,
 
-  /**
-   * Resolves the path to a fixture to the full path.
-   */
-  resolveFixturePath: resolveFixturePath,
-
+  relativeFixturePath: relativeFixturePath,
+  absoluteFixturePath: absoluteFixturePath,
   toJSONRunResult: toJSONRunResult,
 
   /**
@@ -100,7 +97,7 @@ function runMocha(fixturePath, args, fn, opts) {
 
   var path;
 
-  path = resolveFixturePath(fixturePath);
+  path = relativeFixturePath(fixturePath);
   args = args || [];
 
   return invokeSubMocha(
@@ -137,7 +134,7 @@ function runMochaJSON(fixturePath, args, fn, opts) {
 
   var path;
 
-  path = resolveFixturePath(fixturePath);
+  path = relativeFixturePath(fixturePath);
   args = (args || []).concat('--reporter', 'json', path);
 
   return invokeMocha(
@@ -388,13 +385,29 @@ function _spawnMochaWithListeners(args, fn, opts) {
   return mocha;
 }
 
-function resolveFixturePath(fixture) {
+/**
+ * Given a partial fixture path, e.g., 'options/watch/foo', return a fixture filepath relative to project root, e.g.,
+ * `test/integration/fixtures/options/watch/foo.fixture.js`
+ * If `fixture` is absolute, it will not become relative.
+ * @param {string} fixture - Fixture name
+ * @returns {string}
+ */
+function relativeFixturePath(fixture) {
   if (path.extname(fixture) !== '.js' && path.extname(fixture) !== '.mjs') {
     fixture += '.fixture.js';
   }
   return path.isAbsolute(fixture)
     ? fixture
     : path.join('test', 'integration', 'fixtures', fixture);
+}
+
+/**
+ * Returns an absolute fixture filepath
+ * @param {string} fixture - Fixture name
+ * @param {string} [cwd] - Current working directory
+ */
+function absoluteFixturePath(fixture, cwd = process.cwd()) {
+  return path.resolve(cwd, relativeFixturePath(fixture));
 }
 
 /**
