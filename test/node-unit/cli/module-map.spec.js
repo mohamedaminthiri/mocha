@@ -16,6 +16,7 @@ describe('module-map', function() {
     let mocks;
     let moduleMap;
     let ModuleMap;
+    let ModuleNode;
 
     beforeEach(function() {
       mocks = {
@@ -45,7 +46,7 @@ describe('module-map', function() {
         },
         'filing-cabinet': sinon.stub()
       };
-      ModuleMap = rewiremock.proxy(
+      const moduleMapModule = rewiremock.proxy(
         () => require('../../../lib/cli/module-map'),
         r => ({
           'file-entry-cache': r
@@ -60,7 +61,9 @@ describe('module-map', function() {
             .by(() => stubs['find-cache-dir'])
             .directChildOnly()
         })
-      ).ModuleMap;
+      );
+      ModuleMap = moduleMapModule.ModuleMap;
+      ModuleNode = moduleMapModule.ModuleNode;
       sinon.stub(ModuleMap.prototype, 'cwd').get(() => CWD);
     });
 
@@ -82,44 +85,89 @@ describe('module-map', function() {
     describe('instance method', function() {
       beforeEach(function() {
         sinon.stub(ModuleMap.prototype, 'findDependencies').returns([]);
-        sinon.stub(ModuleMap.prototype, 'getChangedFiles').returns([]);
+        sinon.stub(ModuleMap.prototype, 'getChangedFiles');
         sinon.stub(ModuleMap.prototype, '_populate');
         sinon.stub(ModuleMap.prototype, 'save');
       });
 
       describe('_init()', function() {
         beforeEach(function() {
+          sinon.stub(ModuleNode, 'create').returns({some: 'node'});
           sinon.stub(ModuleMap.prototype, 'sync');
-          moduleMap = new ModuleMap({
-            entryFiles: [__filename]
-          });
         });
 
-        describe('if already initialized', function() {
+        describe('when already initialized', function() {
+          beforeEach(function() {
+            ModuleMap.prototype.getChangedFiles.returns([]);
+            moduleMap = ModuleMap.create({
+              entryFiles: [__filename]
+            });
+          });
+
           it('should throw', function() {
             expect(() => moduleMap._init(), 'to throw');
           });
         });
 
-        it('should clear and load from map', function() {
-          expect(moduleMap.sync, 'to have a call satisfying', [
-            {destructive: true}
-          ]);
+        describe('when entry files have changed', function() {
+          beforeEach(function() {
+            ModuleMap.prototype.getChangedFiles.returns([__filename]);
+            moduleMap = ModuleMap.create({
+              entryFiles: [__filename]
+            });
+          });
+          it('should clear and load from map', function() {
+            expect(moduleMap.sync, 'to have a call satisfying', [
+              {destructive: true}
+            ]);
+          });
+
+          it('should look for known changed files', function() {
+            expect(moduleMap.getChangedFiles, 'was called once');
+          });
+
+          it('should populate starting from entry files', function() {
+            expect(moduleMap._populate, 'to have a call satisfying', [
+              new Set([{some: 'node'}]),
+              {force: true}
+            ]);
+          });
+
+          it('should persist the caches', function() {
+            expect(moduleMap.save, 'was called once');
+          });
         });
 
-        it('should look for known changed files', function() {
-          expect(moduleMap.getChangedFiles, 'was called once');
-        });
+        describe('when entry node and no other files have changed', function() {
+          beforeEach(function() {
+            ModuleMap.prototype.getChangedFiles.returns([]);
+            moduleMap = ModuleMap.create({
+              entryFiles: [__filename]
+            });
+          });
 
-        it('should populate starting from entry nodes', function() {
-          expect(moduleMap._populate, 'to have a call satisfying', [
-            new Set([__filename]),
-            {force: true}
-          ]);
+          it('should not populate anything', function() {
+            expect(moduleMap._populate, 'was not called');
+          });
         });
+      });
+    });
 
-        it('should persist the caches', function() {
-          expect(moduleMap.save, 'was called once');
+    describe('computed properties', function() {
+      beforeEach(function() {
+        sinon.stub(ModuleMap.prototype, '_init');
+        moduleMap = new ModuleMap({
+          entryFiles: [__filename, '/some/other/path.js']
+        });
+      });
+
+      describe('entryDirs', function() {
+        it('should return a set of all directories in which entry files live', function() {
+          expect(
+            moduleMap.entryDirs,
+            'to equal',
+            new Set([path.dirname(__filename), '/some/other'])
+          );
         });
       });
     });
