@@ -70,8 +70,8 @@ describe('module-map', function() {
     describe('constructor', function() {
       beforeEach(function() {
         sinon.stub(ModuleMap.prototype, '_init');
-        sinon.stub(ModuleMap.prototype, 'getModuleMapCache');
-        sinon.stub(ModuleMap.prototype, 'getFileEntryCache');
+        sinon.stub(ModuleMap.prototype, 'createModuleMapCache');
+        sinon.stub(ModuleMap.prototype, 'createFileEntryCache');
         moduleMap = new ModuleMap({
           entryFiles: [__filename]
         });
@@ -85,7 +85,7 @@ describe('module-map', function() {
     describe('instance method', function() {
       beforeEach(function() {
         sinon.stub(ModuleMap.prototype, 'findDependencies').returns([]);
-        sinon.stub(ModuleMap.prototype, 'getChangedFiles');
+        sinon.stub(ModuleMap.prototype, '_getChangedFiles');
         sinon.stub(ModuleMap.prototype, '_populate');
         sinon.stub(ModuleMap.prototype, 'save');
       });
@@ -93,12 +93,12 @@ describe('module-map', function() {
       describe('_init()', function() {
         beforeEach(function() {
           sinon.stub(ModuleNode, 'create').returns({some: 'node'});
-          sinon.stub(ModuleMap.prototype, 'sync');
+          sinon.stub(ModuleMap.prototype, 'mergeFromCache');
         });
 
         describe('when already initialized', function() {
           beforeEach(function() {
-            ModuleMap.prototype.getChangedFiles.returns([]);
+            ModuleMap.prototype._getChangedFiles.returns([]);
             moduleMap = ModuleMap.create({
               entryFiles: [__filename]
             });
@@ -111,19 +111,19 @@ describe('module-map', function() {
 
         describe('when entry files have changed', function() {
           beforeEach(function() {
-            ModuleMap.prototype.getChangedFiles.returns([__filename]);
+            ModuleMap.prototype._getChangedFiles.returns([__filename]);
             moduleMap = ModuleMap.create({
               entryFiles: [__filename]
             });
           });
           it('should clear and load from map', function() {
-            expect(moduleMap.sync, 'to have a call satisfying', [
+            expect(moduleMap.mergeFromCache, 'to have a call satisfying', [
               {destructive: true}
             ]);
           });
 
           it('should look for known changed files', function() {
-            expect(moduleMap.getChangedFiles, 'was called once');
+            expect(moduleMap._getChangedFiles, 'was called once');
           });
 
           it('should populate starting from entry files', function() {
@@ -140,7 +140,7 @@ describe('module-map', function() {
 
         describe('when entry node and no other files have changed', function() {
           beforeEach(function() {
-            ModuleMap.prototype.getChangedFiles.returns([]);
+            ModuleMap.prototype._getChangedFiles.returns([]);
             moduleMap = ModuleMap.create({
               entryFiles: [__filename]
             });
