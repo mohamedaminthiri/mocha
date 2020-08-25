@@ -1,8 +1,8 @@
 'use strict';
 
-const {ModuleMap, ModuleNode} = require('../../lib/cli/module-map');
+const {ModuleMap, ModuleNode} = require('../../../lib/cli/module-map');
 const sinon = require('sinon');
-const {absoluteFixturePath} = require('./helpers');
+const {absoluteFixturePath} = require('../helpers');
 
 const TEST_MODULE_MAP_CACHE_FILENAME = 'module-map-integration-test.cache.json';
 const TEST_FILE_ENTRY_CACHE_FILENAME = 'file-entry-integration-test.cache.json';
@@ -218,6 +218,21 @@ describe('module-map', function() {
     // });
   });
 
+  describe('module map cache destruction', function() {
+    beforeEach(function() {
+      moduleMap.resetModuleMapCache();
+    });
+
+    describe('when module map is reloaded', function() {
+      it('should result in an empty module map', function() {
+        const map2 = ModuleMap.create();
+        expect(map2, 'to be empty');
+      });
+    });
+  });
+
+  describe('file entry cache destruction', function() {});
+
   describe('finding entry files affected by a file change', function() {
     describe('when a direct dependency of an entry file is known to have changed', function() {
       it('should return a list of test files to re-run', function() {
@@ -268,7 +283,7 @@ describe('module-map', function() {
             markChangedFiles: [absoluteFixturePath('options/watch/hook')]
           }),
           'to equal',
-          new Set([])
+          {entryFiles: new Set(), allFiles: new Set()}
         );
       });
     });

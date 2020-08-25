@@ -45,7 +45,8 @@ module.exports = () => {
     tests: [
       'test/unit/**/*.spec.js',
       'test/node-unit/**/*.spec.js',
-      'test/integration/module-map.spec.js'
+      'test/integration/cli/module-map.spec.js',
+      'test/integration/cli/resolver.spec.js'
     ],
     env: {
       type: 'node',

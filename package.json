@@ -69,6 +69,7 @@
     "log-symbols": "4.0.0",
     "minimatch": "3.0.4",
     "ms": "2.1.2",
+    "multimatch": "4.0.0",
     "object.assign": "4.1.0",
     "parents": "1.0.1",
     "precinct": "6.3.1",
