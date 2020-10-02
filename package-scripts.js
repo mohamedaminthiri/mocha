@@ -23,8 +23,8 @@ function test(testName, mochaParams) {
   if (process.env.MOCHA_PARALLEL === '0') {
     mochaParams += ' --no-parallel';
   }
-  if (process.env.TRAVIS) {
-    mochaParams += ' --color'; // force color in travis-ci
+  if (process.env.CI) {
+    mochaParams += ' --color'; // force color in CI
   }
   return `${
     process.env.COVERAGE ? coverageCommand : ''
@@ -247,6 +247,10 @@ module.exports = {
       script: 'nyc report --reporter=text-lcov | coveralls',
       description: 'Send code coverage report to coveralls (run during CI)',
       hiddenFromHelp: true
+    },
+    'coverage-report-lcov': {
+      script: 'nyc report --reporter=lcov',
+      description: 'Write LCOV report to disk (run tests with COVERAGE=1 first)'
     },
     'coverage-report': {
       script: 'nyc report --reporter=html',
