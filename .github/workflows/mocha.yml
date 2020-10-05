@@ -132,13 +132,13 @@ jobs:
         run: |
           echo "::set-output name=dir::$(npm config get cache)"
       - uses: actions/checkout@v2
-      - name: 'Cache node_modules'
-        uses: actions/cache@v2
-        with:
-          path: '${{ steps.npm-cache.outputs.dir }}'
-          key: "${{ matrix.os }}-node-v${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}"
-          restore-keys: |
-            ${{ matrix.os }}-node-v${{ matrix.node }}-
+      # - name: 'Cache node_modules'
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: '${{ steps.npm-cache.outputs.dir }}'
+      #     key: "${{ matrix.os }}-node-v${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}"
+      #     restore-keys: |
+      #       ${{ matrix.os }}-node-v${{ matrix.node }}-
       - name: Install Dependencies
         run: time npm ci --ignore-scripts
       - name: Lint Sources & Markdown (Linux + Node.js latest)
